@@ -1,0 +1,22 @@
+.buglist {
+  margin-top: 15px;
+}
+
+.buglist table {
+  border: 1px solid black;
+  border-collapse: collapse;
+}
+
+.buglist caption {
+  font-size: 110%;
+  text-align: left;
+  font-weight: bold;
+}
+
+.buglist th, .buglist td {
+  border: 1px solid black;
+}
+
+.buglist td {
+  padding: 2px;
+}
