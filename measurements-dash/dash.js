@@ -23,6 +23,8 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 "use strict";
 
+let bugzilla = bz.createClient();
+
 let bugLists = new Map([
     ["commitments (p1)", {
       searchParams: {
@@ -71,7 +73,23 @@ let bugLists = new Map([
     }],
 ]);
 
-let bugzilla = bz.createClient();
+function alias(email) {
+  let shortNames = new Map([
+    ["gfritzsche@mozilla.com", "georg"],
+    ["alessio.placitelli@gmail.com", "alessio"],
+    ["nobody@mozilla.org", "-"],
+  ]);
+
+  return shortNames.get(email) || email;
+}
+
+function getBugField(bug, field) {
+  let value = bug[field];
+  switch (field) {
+    case "assigned_to": return alias(value);
+    default: return value;
+  }
+}
 
 function searchBugs(searchParams) {
   return new Promise((resolve, reject) => {
@@ -126,6 +144,7 @@ function addBugList(listName, listOptions, bugs) {
     for (let field of bugFields) {
       let cell = document.createElement("td");
       cell.appendChild(document.createTextNode(bug[field]));
+      cell.appendChild(document.createTextNode(getBugField(bug, field)));
       row.appendChild(cell);
     }
     table.appendChild(row);
