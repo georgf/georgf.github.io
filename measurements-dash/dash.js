@@ -30,6 +30,7 @@ let bugLists = new Map([
         priority: "P1",
         resolution: "---",
       },
+      columns: ["assigned_to", "status", "cf_fx_points", "summary"],
     }],
     ["potentials (p2)", {
       searchParams: {
@@ -37,6 +38,7 @@ let bugLists = new Map([
         priority: "P2",
         resolution: "---",
       },
+      columns: ["assigned_to", "status", "cf_fx_points", "summary"],
     }],
     ["mentored (wip)", {
       searchParams: {
@@ -102,6 +104,7 @@ function addBugList(listName, listOptions, bugs) {
 
   let row = document.createElement("tr");
   let bugFields = ["assigned_to", "status", "summary"];
+  let bugFields = listOptions.columns || ["assigned_to", "status", "summary"];
   for (let field of ["#", ...bugFields]) {
     let cell = document.createElement("th");
     cell.appendChild(document.createTextNode(field));
