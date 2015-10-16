@@ -91,6 +91,15 @@ function getBugField(bug, field) {
   }
 }
 
+function niceFieldName(fieldName) {
+  let niceNames = new Map([
+    ["assigned_to", "assignee"],
+    ["cf_fx_points", "points"],
+  ]);
+
+  return niceNames.get(fieldName) || fieldName;
+}
+
 function searchBugs(searchParams) {
   return new Promise((resolve, reject) => {
     bugzilla.searchBugs(searchParams, (error, bugs) => {
@@ -121,11 +130,10 @@ function addBugList(listName, listOptions, bugs) {
   table.appendChild(caption);
 
   let row = document.createElement("tr");
-  let bugFields = ["assigned_to", "status", "summary"];
   let bugFields = listOptions.columns || ["assigned_to", "status", "summary"];
   for (let field of ["#", ...bugFields]) {
     let cell = document.createElement("th");
-    cell.appendChild(document.createTextNode(field));
+    cell.appendChild(document.createTextNode(niceFieldName(field)));
     row.appendChild(cell);
   }
   table.appendChild(row);
@@ -143,7 +151,6 @@ function addBugList(listName, listOptions, bugs) {
 
     for (let field of bugFields) {
       let cell = document.createElement("td");
-      cell.appendChild(document.createTextNode(bug[field]));
       cell.appendChild(document.createTextNode(getBugField(bug, field)));
       row.appendChild(cell);
     }
