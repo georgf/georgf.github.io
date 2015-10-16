@@ -77,6 +77,9 @@ function alias(email) {
   let shortNames = new Map([
     ["gfritzsche@mozilla.com", "georg"],
     ["alessio.placitelli@gmail.com", "alessio"],
+    ["yarik.sheptykin@googlemail.com", "iaroslav"],
+    ["robertthyberg@gmail.com", "robert thyberg"],
+    ["areinald.bug@bolet.no-ip.com", "areinald"],
     ["nobody@mozilla.org", "-"],
   ]);
 
