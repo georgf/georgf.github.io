@@ -23,10 +23,12 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 "use strict";
 
+let gCategory;
 let bugzilla = bz.createClient();
 
 let bugLists = new Map([
     ["commitments (p1)", {
+      category: "active",
       searchParams: {
         whiteboard: "[measurement:client]",
         priority: "P1",
@@ -35,6 +37,7 @@ let bugLists = new Map([
       columns: ["assigned_to", "status", "cf_fx_points", "summary"],
     }],
     ["potentials (p2)", {
+      category: "active",
       searchParams: {
         whiteboard: "[measurement:client]",
         priority: "P2",
@@ -43,6 +46,7 @@ let bugLists = new Map([
       columns: ["assigned_to", "status", "cf_fx_points", "summary"],
     }],
     ["mentored (wip)", {
+      category: "active",
       searchParams: {
         resolution: "---",
         emailtype1: "regexp",
@@ -54,6 +58,7 @@ let bugLists = new Map([
       },
     }],
     ["backlog (p3)", {
+      category: "backlog",
       searchParams: {
         whiteboard: "[measurement:client]",
         priority: "P3",
@@ -61,6 +66,7 @@ let bugLists = new Map([
       },
     }],
     ["mentored (free)", {
+      category: "mentored",
       searchParams: {
         resolution: "---",
         emailtype1: "regexp",
@@ -115,6 +121,12 @@ function searchBugs(searchParams) {
   });
 }
 
+function removeAllChildNodes(node) {
+  while(node.hasChildNodes()) {
+    node.removeChild(node.lastChild);
+  }
+}
+
 function addBugList(listName, listOptions, bugs) {
   console.log("addBugList - " + listName);
 
@@ -165,13 +177,48 @@ function addBugList(listName, listOptions, bugs) {
 
 function update() {
   console.log("updating...");
-  let promise = new Promise((resolve) => resolve());
+  removeAllChildNodes(document.getElementById("content"));
 
+  let promise = new Promise((resolve) => resolve());
   for (let entry of bugLists) {
     let [listName, listOptions] = entry;
+    if (listOptions.category != gCategory) {
+      continue;
+    }
+
     promise = promise.then(() => searchBugs(listOptions.searchParams))
                      .then(bugs => addBugList(listName, listOptions, bugs));
   }
 }
 
-update();
+function createCategories() {
+  let categories = new Set([for (bl of bugLists) bl[1].category]);
+  let container = document.getElementById("categories");
+  let form = document.createElement("form");
+
+  for (let title of categories) {
+    let radio = document.createElement("input");
+    radio.name = "category";
+    radio.value = title;
+    radio.type = "radio";
+    radio.addEventListener("change", (evt) => {
+      gCategory = evt.target.value;
+      update();
+    }, false);
+    let label = document.createElement("label");
+    label.appendChild(radio);
+    label.appendChild(document.createTextNode(title));
+    form.appendChild(label);
+  }
+
+  container.appendChild(form);
+  container.children[0].children[0].children[0].checked = true;
+  gCategory = categories.values().next().value;
+}
+
+function init() {
+  createCategories();
+  update();
+}
+
+init();
