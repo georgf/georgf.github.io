@@ -11,6 +11,14 @@
   padding-left: 18px;
 }
 
+#categories {
+  margin: 20px 5px 0px 5px;
+}
+
+#categories form {
+  display: inline;
+}
+
 .buglist {
   margin-top: 15px;
 }
