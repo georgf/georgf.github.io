@@ -127,6 +127,40 @@ function removeAllChildNodes(node) {
   }
 }
 
+function createLink(text, url) {
+  let link = document.createElement("a");
+  link.setAttribute("href", url);
+  link.setAttribute("target", "_blank");
+  link.appendChild(document.createTextNode(text));
+  return link;
+}
+
+function createTableHeaders(titles) {
+  let row = document.createElement("tr");
+  for (let title of titles) {
+    let cell = document.createElement("th");
+    cell.appendChild(document.createTextNode(niceFieldName(title)));
+    row.appendChild(cell);
+  }
+  return row;
+}
+
+function createTableRow(contents) {
+  let row = document.createElement("tr");
+
+  for (let content of contents) {
+    let cell = document.createElement("td");
+    if (typeof(content) === "function") {
+      content(cell);
+    } else {
+      cell.appendChild(document.createTextNode(content));
+    }
+    row.appendChild(cell);
+  }
+
+  return row;
+}
+
 function addBugList(listName, listOptions, bugs) {
   console.log("addBugList - " + listName);
 
@@ -144,32 +178,18 @@ function addBugList(listName, listOptions, bugs) {
   caption.appendChild(document.createTextNode(listName));
   table.appendChild(caption);
 
-  let row = document.createElement("tr");
   let bugFields = listOptions.columns || ["assigned_to", "status", "summary"];
-  for (let field of ["#", ...bugFields]) {
-    let cell = document.createElement("th");
-    cell.appendChild(document.createTextNode(niceFieldName(field)));
-    row.appendChild(cell);
-  }
-  table.appendChild(row);
+  table.appendChild(createTableHeaders([
+    "#",
+    ...[for (f of bugFields) niceFieldName(f)],
+  ]));
 
   for (let bug of bugs) {
-    let row = document.createElement("tr");
-
-    let cell = document.createElement("td");
-    let link = document.createElement("a");
-    link.setAttribute("href", "https://bugzilla.mozilla.org/show_bug.cgi?id=" + bug.id);
-    link.setAttribute("target", "_blank");
-    link.appendChild(document.createTextNode("#"));
-    cell.appendChild(link);
-    row.appendChild(cell);
-
-    for (let field of bugFields) {
-      let cell = document.createElement("td");
-      cell.appendChild(document.createTextNode(getBugField(bug, field)));
-      row.appendChild(cell);
-    }
-    table.appendChild(row);
+    let url = "https://bugzilla.mozilla.org/show_bug.cgi?id=" + bug.id;
+    table.appendChild(createTableRow([
+      (cell) => cell.appendChild(createLink("#", url)),
+      ...[for (f of bugFields) getBugField(bug, f)],
+    ]));
   }
 
   content.appendChild(section);
