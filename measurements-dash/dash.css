@@ -1,3 +1,16 @@
+#notes {
+  font-size: 70%;
+  font-style: italic;
+  margin: 5px;
+  padding: 3px;
+  background-color: #f0f0f0;
+}
+
+#notes ul {
+  margin: 0px;
+  padding-left: 18px;
+}
+
 .buglist {
   margin-top: 15px;
 }
