@@ -34,7 +34,7 @@ let bugLists = new Map([
         priority: "P1",
         resolution: "---",
       },
-      columns: ["assigned_to", "status", "cf_fx_points", "summary"],
+      columns: ["assigned_to", "cf_fx_points", "summary"],
     }],
     ["potentials (p2)", {
       category: "active",
@@ -43,7 +43,7 @@ let bugLists = new Map([
         priority: "P2",
         resolution: "---",
       },
-      columns: ["assigned_to", "status", "cf_fx_points", "summary"],
+      columns: ["assigned_to", "cf_fx_points", "summary"],
     }],
     ["mentored (wip)", {
       category: "active",
@@ -56,6 +56,7 @@ let bugLists = new Map([
         email2: "nobody@mozilla.org",
         emailassigned_to2: "1",
       },
+      columns: ["assigned_to", "summary", "whiteboard"],
     }],
     ["backlog (p3)", {
       category: "backlog",
@@ -64,6 +65,7 @@ let bugLists = new Map([
         priority: "P3",
         resolution: "---",
       },
+      columns: ["assigned_to", "summary", "whiteboard"],
     }],
     ["mentored (free)", {
       category: "mentored",
@@ -76,6 +78,7 @@ let bugLists = new Map([
         email2: "nobody@mozilla.org",
         emailassigned_to2: "1",
       },
+      columns: ["summary", "whiteboard"],
     }],
 ]);
 
