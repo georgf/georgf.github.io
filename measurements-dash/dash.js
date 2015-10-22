@@ -171,7 +171,7 @@ function addBugList(listName, listOptions, bugs) {
   console.log("addBugList - " + listName);
 
   bugs = bugs.filter(b => b.resolution == "");
-  bugs.sort((a, b) => a.status.localeCompare(b.status));
+  bugs.sort((a, b) => a.assigned_to.localeCompare(b.assigned_to));
 
   let content = document.getElementById("content");
   let section = document.createElement("div");
