@@ -98,7 +98,10 @@ function alias(email) {
 function getBugField(bug, field) {
   let value = bug[field];
   switch (field) {
-    case "assigned_to": return alias(value);
+    case "assigned_to":
+      return alias(value);
+    case "whiteboard":
+      return value.replace("[measurement:client]", "").trim();
     default: return value;
   }
 }
