@@ -167,11 +167,25 @@ function createTableRow(contents) {
   return row;
 }
 
+function compareBugsByAssignee(a, b) {
+  a = a.assigned_to;
+  b = b.assigned_to;
+
+  if (a == b)
+    return 0;
+  if (a == "nobody@mozilla.org")
+    return 1;
+  if (b == "nobody@mozilla.org")
+    return -1;
+
+  return a.localeCompare(b);
+}
+
 function addBugList(listName, listOptions, bugs) {
   console.log("addBugList - " + listName);
 
   bugs = bugs.filter(b => b.resolution == "");
-  bugs.sort((a, b) => a.assigned_to.localeCompare(b.assigned_to));
+  bugs.sort(compareBugsByAssignee);
 
   let content = document.getElementById("content");
   let section = document.createElement("div");
