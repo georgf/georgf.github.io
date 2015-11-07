@@ -45,6 +45,13 @@ let bugLists = new Map([
       },
       columns: ["assigned_to", "cf_fx_points", "summary"],
     }],
+    ["tracking", {
+      category: "active",
+      searchParams: {
+        whiteboard: "[measurement:client:tracking]",
+      },
+      columns: ["assigned_to", "summary"],
+    }],
     ["mentored (wip)", {
       category: "active",
       searchParams: {
