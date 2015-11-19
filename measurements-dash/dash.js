@@ -87,7 +87,28 @@ let bugLists = new Map([
       },
       columns: ["summary", "whiteboard"],
     }],
+    ["mentees", {
+      category: "mentees",
+      searchParams: {
+        emailtype1: "regexp",
+        email1: "gfritzsche@mozilla.com|alessio.placitelli@gmail.com",
+        emailbug_mentor1: "1",
+        emailtype2: "notequals",
+        email2: "nobody@mozilla.org",
+        emailassigned_to2: "1",
+      },
+      advancedSearch: {
+        lastChangedNDaysAgo: 30,
+      },
+      columns: ["assigned_to", "status", "summary", "whiteboard"],
+    }],
 ]);
+
+var MS_IN_A_DAY = 24 * 60 * 60 * 1000;
+
+function futureDate(date, offset) {
+  return new Date(date.getTime() + offset);
+}
 
 function alias(email) {
   let shortNames = new Map([
@@ -122,8 +143,14 @@ function niceFieldName(fieldName) {
   return niceNames.get(fieldName) || fieldName;
 }
 
-function searchBugs(searchParams) {
+function searchBugs(searchParams, advancedSearch = {}) {
   return new Promise((resolve, reject) => {
+    if ("lastChangedNDaysAgo" in advancedSearch) {
+      let days = advancedSearch.lastChangedNDaysAgo;
+      let date = futureDate(new Date(), - (days * MS_IN_A_DAY));
+      searchParams.last_change_time = date.toISOString().substring(0, 10);
+    }
+
     bugzilla.searchBugs(searchParams, (error, bugs) => {
       if (error) {
         reject(error);
@@ -191,7 +218,7 @@ function compareBugsByAssignee(a, b) {
 function addBugList(listName, listOptions, bugs) {
   console.log("addBugList - " + listName);
 
-  bugs = bugs.filter(b => b.resolution == "");
+  //bugs = bugs.filter(b => b.resolution == "");
   bugs.sort(compareBugsByAssignee);
 
   let content = document.getElementById("content");
@@ -233,7 +260,7 @@ function update() {
       continue;
     }
 
-    promise = promise.then(() => searchBugs(listOptions.searchParams))
+    promise = promise.then(() => searchBugs(listOptions.searchParams, listOptions.advancedSearch))
                      .then(bugs => addBugList(listName, listOptions, bugs));
   }
 }
