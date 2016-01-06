@@ -52,6 +52,13 @@ let bugLists = new Map([
       },
       columns: ["assigned_to", "summary"],
     }],
+    ["project", {
+      category: "active",
+      searchParams: {
+        whiteboard: "[measurement:client:project]",
+      },
+      columns: ["summary"],
+    }],
     ["mentored (wip)", {
       category: "active",
       searchParams: {
