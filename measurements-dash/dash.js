@@ -72,11 +72,29 @@ let bugLists = new Map([
       },
       columns: ["assigned_to", "summary", "whiteboard"],
     }],
-    ["backlog (p3)", {
-      category: "backlog",
+    ["backlog, quarter (p3)", {
+      category: "p3",
       searchParams: {
         whiteboard: "[measurement:client]",
         priority: "P3",
+        resolution: "---",
+      },
+      columns: ["assigned_to", "summary", "whiteboard"],
+    }],
+    ["backlog, year (p4)", {
+      category: "p4",
+      searchParams: {
+        whiteboard: "[measurement:client]",
+        priority: "P4",
+        resolution: "---",
+      },
+      columns: ["assigned_to", "summary", "whiteboard"],
+    }],
+    ["backlog, low priority", {
+      category: "p5",
+      searchParams: {
+        whiteboard: "[measurement:client]",
+        priority: "P5",
         resolution: "---",
       },
       columns: ["assigned_to", "summary", "whiteboard"],
