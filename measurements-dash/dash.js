@@ -48,6 +48,7 @@ let bugLists = new Map([
     ["tracking", {
       category: "active",
       searchParams: {
+        resolution: "---",
         whiteboard: "[measurement:client:tracking]",
       },
       columns: ["assigned_to", "summary"],
@@ -55,6 +56,7 @@ let bugLists = new Map([
     ["project", {
       category: "active",
       searchParams: {
+        resolution: "---",
         whiteboard: "[measurement:client:project]",
       },
       columns: ["summary"],
@@ -243,7 +245,6 @@ function compareBugsByAssignee(a, b) {
 function addBugList(listName, listOptions, bugs) {
   console.log("addBugList - " + listName);
 
-  //bugs = bugs.filter(b => b.resolution == "");
   bugs.sort(compareBugsByAssignee);
 
   let content = document.getElementById("content");
