@@ -256,6 +256,7 @@ function addBugList(listName, listOptions, bugs) {
 
   let caption = document.createElement("caption");
   caption.appendChild(document.createTextNode(listName));
+  caption.setAttribute("title", "" + bugs.length + " bugs");
   table.appendChild(caption);
 
   let bugFields = listOptions.columns || ["assigned_to", "status", "summary"];
