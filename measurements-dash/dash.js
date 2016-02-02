@@ -297,24 +297,29 @@ function createCategories() {
   let container = document.getElementById("categories");
   let form = document.createElement("form");
 
+  let hash = window.location.hash.substring(1);
+  gCategory = categories.has(hash) ? hash : categories.values().next().value;
+
   for (let title of categories) {
     let radio = document.createElement("input");
     radio.name = "category";
     radio.value = title;
     radio.type = "radio";
+    radio.checked = (title === gCategory);
     radio.addEventListener("change", (evt) => {
       gCategory = evt.target.value;
+      window.location = "#" + evt.target.value;
       update();
     }, false);
+
     let label = document.createElement("label");
     label.appendChild(radio);
     label.appendChild(document.createTextNode(title));
+
     form.appendChild(label);
   }
 
   container.appendChild(form);
-  container.children[0].children[0].children[0].checked = true;
-  gCategory = categories.values().next().value;
 }
 
 function init() {
