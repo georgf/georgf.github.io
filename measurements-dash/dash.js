@@ -144,6 +144,8 @@ function alias(email) {
     ["yarik.sheptykin@googlemail.com", "iaroslav"],
     ["robertthyberg@gmail.com", "robert thyberg"],
     ["areinald.bug@bolet.no-ip.com", "areinald"],
+    ["penhlenh@gmail.com", "penh lenh"],
+    ["pineapple.rice@gmail.com", "eric hu"],
     ["nobody@mozilla.org", "-"],
   ]);
 
