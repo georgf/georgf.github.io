@@ -129,6 +129,17 @@ let bugLists = new Map([
       },
       columns: ["assigned_to", "status", "summary", "whiteboard"],
     }],
+    ["recent", {
+      category: "recent",
+      searchParams: {
+        whiteboard: "[measurement:client]",
+      },
+      advancedSearch: {
+        lastChangedNDaysAgo: 30,
+      },
+      columns: ["last_change_time", "assigned_to", "status", "summary"],
+      sortColumn: "last_change_time",
+    }],
 ]);
 
 var MS_IN_A_DAY = 24 * 60 * 60 * 1000;
@@ -244,10 +255,19 @@ function compareBugsByAssignee(a, b) {
   return a.localeCompare(b);
 }
 
+function getSorter(listOptions) {
+  switch (listOptions.sortColumn) {
+    case "last_change_time":
+      return (a, b) => - a.last_change_time.localeCompare(b.last_change_time);
+    default:
+      return compareBugsByAssignee;
+  }
+}
+
 function addBugList(listName, listOptions, bugs) {
   console.log("addBugList - " + listName);
 
-  bugs.sort(compareBugsByAssignee);
+  bugs.sort(getSorter(listOptions));
 
   let content = document.getElementById("content");
   let section = document.createElement("div");
