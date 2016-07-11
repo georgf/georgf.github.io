@@ -45,14 +45,6 @@ let bugLists = new Map([
       },
       columns: ["assigned_to", "cf_fx_points", "summary"],
     }],
-    ["tracking", {
-      category: "active",
-      searchParams: {
-        resolution: "---",
-        whiteboard: "[measurement:client:tracking]",
-      },
-      columns: ["assigned_to", "summary"],
-    }],
     ["mentored (wip)", {
       category: "active",
       searchParams: {
@@ -65,6 +57,14 @@ let bugLists = new Map([
         emailassigned_to2: "1",
       },
       columns: ["assigned_to", "summary", "whiteboard"],
+    }],
+    ["tracking", {
+      category: "active",
+      searchParams: {
+        resolution: "---",
+        whiteboard: "[measurement:client:tracking]",
+      },
+      columns: ["assigned_to", "summary"],
     }],
     ["project", {
       category: "active",
