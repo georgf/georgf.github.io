@@ -53,14 +53,6 @@ let bugLists = new Map([
       },
       columns: ["assigned_to", "summary"],
     }],
-    ["project", {
-      category: "active",
-      searchParams: {
-        resolution: "---",
-        whiteboard: "[measurement:client:project]",
-      },
-      columns: ["summary"],
-    }],
     ["mentored (wip)", {
       category: "active",
       searchParams: {
@@ -73,6 +65,14 @@ let bugLists = new Map([
         emailassigned_to2: "1",
       },
       columns: ["assigned_to", "summary", "whiteboard"],
+    }],
+    ["project", {
+      category: "active",
+      searchParams: {
+        resolution: "---",
+        whiteboard: "[measurement:client:project]",
+      },
+      columns: ["summary"],
     }],
     ["backlog, quarter (p3)", {
       category: "p3",
