@@ -157,7 +157,7 @@ function alias(email) {
     ["areinald.bug@bolet.no-ip.com", "areinald"],
     ["penhlenh@gmail.com", "penh lenh"],
     ["pineapple.rice@gmail.com", "eric hu"],
-    ["jdorlus@mozilla.com", "jdorlus"]
+    ["jdorlus@mozilla.com", "jdorlus"],
     ["nobody@mozilla.org", "-"],
   ]);
 
