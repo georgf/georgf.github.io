@@ -172,6 +172,8 @@ function getBugField(bug, field) {
       return alias(value);
     case "whiteboard":
       return value.replace("[measurement:client]", "").trim();
+    case "summary":
+      return (value.length <= 100) ? value : (value.substring(0, 100) +  " ...");
     default: return value;
   }
 }
