@@ -4,7 +4,7 @@
 
 <html>
 <head>
-<title>Firefox data explorer</title>
+<title>Firefox data explorer - Find probes</title>
 <style type="text/css">
   table {
     border-collapse: collapse;
@@ -18,9 +18,8 @@
   }
 </style>
 <script type="text/javascript"
-        src="https://code.jquery.com/jquery-3.1.1.min.js"
-        integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8="
-        crossorigin="anonymous"></script>
+        src="jquery-3.1.1.min.js">
+</script>
 <script type="text/javascript" src="explore.js"></script>
 </head>
 
@@ -28,18 +27,30 @@
 
 <a href="https://github.com/georgf/fx-data-explorer"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://camo.githubusercontent.com/a6677b08c955af8400f44c6298f40e7d19cc5b2d/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f677261795f3664366436642e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_gray_6d6d6d.png"></a>
 
+find probes | <a href="stats.html">stats</a>
+<br/>
+<br/>
+
 <form>
+  Probe is
   <select id="select_constraint">
-    <option value="is_in" selected="selected">Is recorded in</option>
-    <option value="new_in">Is new in</option>
+    <option value="is_in" selected="selected">recorded in</option>
+    <option value="new_in">new in</option>
   </select>
-  version:
+  version
   <select id="select_version">
     <option id="version_any" value="any" selected="selected">Any</option>
   </select>
+  on channel
+  <select id="select_channel">
+    <option value="release" selected="selected">release</option>
+    <option value="beta">beta</option>
+    <option value="aurora">aurora</option>
+  </select>
+  .
   <br />
   <input id="optout" type="checkbox" checked="checked">
-  <label for="optout">opt-out measurements only</label>
+  <label for="optout">Show only opt-out measurements.</label>
   <br />
   Text search
   <select id="search_constraint">
@@ -47,6 +58,7 @@
     <option value="in_name">in name</option>
     <option value="in_description">in description</option>
   </select>
+  for:
   <input id="text_search" name="text_search">
 </form>
 

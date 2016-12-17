@@ -17,6 +17,8 @@ $(document).ready(function() {
 
     $("#select_constraint").change(update);
     $("#select_version").change(update);
+    $("#select_version").keyup(update);
+    $("#select_channel").change(update);
     $("#optout").change(update);
     $("#text_search").keyup(update);
     $("#search_constraint").change(update);
@@ -24,24 +26,33 @@ $(document).ready(function() {
 });
 
 function update() {
+  var filtered = filterMeasurements();
+  renderMeasurements(filtered);
+  renderStats(filtered);
+}
+
+function filterMeasurements() {
   var version_constraint = $("#select_constraint").val();
   var optout = $("#optout").prop("checked");
   var revision = $("#select_version").val();
+  var channel = $("#select_channel").val();
   var text_search = $("#text_search").val();
   var text_constraint = $("#search_constraint").val();
   var measurements = gData.measurements;
 
   // No filtering? Just render everything.
   if ((revision == "any") && !optout && (text_search == "")) {
-    renderMeasurements(measurements);
-    return;
+    return measurements;
   }
 
   // Filter out by selected criteria.
   var filtered = {};
 
   $.each(measurements, (id, data) => {
-    var history = data.history
+    var history = data.history[channel];
+    if (!history) {
+      return;
+    }
 
     // Filter by optout.
     if (optout) {
@@ -56,7 +67,9 @@ function update() {
           case "is_in":
             var first_ver = parseInt(gData.revisions[m.revisions.first].version);
             var last_ver = parseInt(gData.revisions[m.revisions.last].version);
-            return (first_ver <= version) && (last_ver >= version);
+            var expires = m.expiry_version;
+            return (first_ver <= version) && (last_ver >= version) &&
+                   ((expires == "never") || (parseInt(expires) >= version));
           case "new_in":
             return m.revisions.first == revision;
           default:
@@ -89,8 +102,7 @@ function update() {
     }
   });
 
-  renderMeasurements(filtered);
-  renderStats(filtered);
+  return filtered;
 }
 
 function renderVersions() {
@@ -138,6 +150,7 @@ function renderMeasurements(measurements) {
       ["optout", (d, h) => h.optout],
       ["first", (d, h) => first_version(h)],
       ["last", (d, h) => last_version(h)],
+      ["expiry", (d, h) => h.expiry_version],
       ["dist", (d, h) => `<a href="${getHistogramDistributionURL(d.name, d.type, first_version(h), last_version(h))}">#</a>`],
       ["description", (d, h) => h.description],
     ]);
