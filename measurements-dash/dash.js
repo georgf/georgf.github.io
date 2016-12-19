@@ -66,6 +66,14 @@ let bugLists = new Map([
       },
       columns: ["assigned_to", "summary"],
     }],
+    ["uplifts", {
+      category: "active",
+      searchParams: {
+        resolution: "---",
+        whiteboard: "[measurement:client:uplift]",
+      },
+      columns: ["assigned_to", "summary"],
+    }],
     ["project", {
       category: "active",
       searchParams: {
