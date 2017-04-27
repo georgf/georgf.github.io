@@ -163,20 +163,25 @@ function futureDate(date, offset) {
 
 function alias(email) {
   let shortNames = new Map([
-    ["gfritzsche@mozilla.com", "georg"],
     ["alessio.placitelli@gmail.com", "alessio"],
     ["yarik.sheptykin@googlemail.com", "iaroslav"],
     ["robertthyberg@gmail.com", "robert thyberg"],
     ["areinald.bug@bolet.no-ip.com", "areinald"],
     ["penhlenh@gmail.com", "penh lenh"],
     ["pineapple.rice@gmail.com", "eric hu"],
-    ["jdorlus@mozilla.com", "jdorlus"],
-    ["bforehand@mozilla.com", "bforehand"],
-    ["chutten@mozilla.com", "chutten"],
     ["nobody@mozilla.org", "-"],
   ]);
 
-  return shortNames.get(email) || email;
+  if (shortNames.has(email)) {
+    return shortNames.get(email);
+  }
+
+  let mozSuffix = "@mozilla.com";
+  if (email.endsWith(mozSuffix)) {
+    return email.replace(mozSuffix, "");
+  }
+
+  return email;
 }
 
 function getBugField(bug, field) {
