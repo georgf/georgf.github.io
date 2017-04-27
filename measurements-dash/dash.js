@@ -421,6 +421,7 @@ function addBugList(listName, listOptions, bugs) {
 
 function update() {
   console.log("updating...");
+  document.getElementById("overlay").style.display = "block";
   removeAllChildNodes(document.getElementById("content"));
 
   let promise = new Promise((resolve) => resolve());
@@ -433,6 +434,8 @@ function update() {
     promise = promise.then(() => joinMultipleBugSearches(listOptions.searches))
                      .then(bugs => addBugList(listName, listOptions, bugs));
   }
+
+  promise.then(() => document.getElementById("overlay").style.display = "none");
 }
 
 function createCategories() {
