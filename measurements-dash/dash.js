@@ -420,18 +420,21 @@ function update() {
   document.getElementById("overlay").style.display = "block";
   removeAllChildNodes(document.getElementById("content"));
 
-  let promise = new Promise((resolve) => resolve());
-  for (let entry of bugLists) {
-    let [listName, listOptions] = entry;
-    if (listOptions.category != gCategory) {
-      continue;
+  let shownLists = [...bugLists].filter(bl => bl[1].category == gCategory);
+  let searchPromises = shownLists.map(bl => {
+    return joinMultipleBugSearches(bl[1].searches);
+  });
+
+  Promise.all(searchPromises).then(results => {
+    for (let i = 0; i < results.length; ++i) {
+      let bugs = results[i];
+      let [listName, listOptions] = shownLists[i];
+
+      addBugList(listName, listOptions, bugs);
     }
 
-    promise = promise.then(() => joinMultipleBugSearches(listOptions.searches))
-                     .then(bugs => addBugList(listName, listOptions, bugs));
-  }
-
-  promise.then(() => document.getElementById("overlay").style.display = "none");
+    document.getElementById("overlay").style.display = "none";
+  });
 }
 
 function createCategories() {
