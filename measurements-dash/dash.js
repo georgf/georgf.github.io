@@ -26,6 +26,12 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 let gCategory;
 let bugzilla = bz.createClient();
 
+let teamEmails = [
+  "chutten@mozilla.com",
+  "gfritzsche@mozilla.com",
+  "alessio.placitelli@gmail.com",
+];
+
 let bugLists = new Map([
     ["commitments (p1)", {
       category: "active",
@@ -50,7 +56,7 @@ let bugLists = new Map([
       searchParams: {
         resolution: "---",
         emailtype1: "regexp",
-        email1: "gfritzsche@mozilla.com|alessio.placitelli@gmail.com",
+        email1: teamEmails.join("|"),
         emailbug_mentor1: "1",
         emailtype2: "notequals",
         email2: "nobody@mozilla.org",
@@ -113,7 +119,7 @@ let bugLists = new Map([
       searchParams: {
         resolution: "---",
         emailtype1: "regexp",
-        email1: "gfritzsche@mozilla.com|alessio.placitelli@gmail.com",
+        email1: teamEmails.join("|"),
         emailbug_mentor1: "1",
         emailtype2: "equals",
         email2: "nobody@mozilla.org",
@@ -125,7 +131,7 @@ let bugLists = new Map([
       category: "mentees",
       searchParams: {
         emailtype1: "regexp",
-        email1: "gfritzsche@mozilla.com|alessio.placitelli@gmail.com",
+        email1: teamEmails.join("|"),
         emailbug_mentor1: "1",
         emailtype2: "notequals",
         email2: "nobody@mozilla.org",
