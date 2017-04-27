@@ -43,6 +43,13 @@ let bugLists = new Map([
             resolution: "---",
           },
         },
+        {
+          searchParams: {
+            quicksearch: "assigned_to:" + teamEmails.join(","),
+            priority: "P1",
+            resolution: "---",
+          },
+        },
       ],
       columns: ["assigned_to", "cf_fx_points", "summary"],
     }],
@@ -52,6 +59,13 @@ let bugLists = new Map([
         {
           searchParams: {
             whiteboard: "[measurement:client]",
+            priority: "P2",
+            resolution: "---",
+          },
+        },
+        {
+          searchParams: {
+            quicksearch: "assigned_to:" + teamEmails.join(","),
             priority: "P2",
             resolution: "---",
           },
@@ -121,6 +135,13 @@ let bugLists = new Map([
             resolution: "---",
           },
         },
+        {
+          searchParams: {
+            quicksearch: "assigned_to:" + teamEmails.join(","),
+            priority: "P3",
+            resolution: "---",
+          },
+        },
       ],
       columns: ["assigned_to", "summary", "whiteboard"],
     }],
@@ -134,6 +155,13 @@ let bugLists = new Map([
             resolution: "---",
           },
         },
+        {
+          searchParams: {
+            quicksearch: "assigned_to:" + teamEmails.join(","),
+            priority: "P4",
+            resolution: "---",
+          },
+        },
       ],
       columns: ["assigned_to", "summary", "whiteboard"],
     }],
@@ -143,6 +171,13 @@ let bugLists = new Map([
         {
           searchParams: {
             whiteboard: "[measurement:client]",
+            priority: "P5",
+            resolution: "---",
+          },
+        },
+        {
+          searchParams: {
+            quicksearch: "assigned_to:" + teamEmails.join(","),
             priority: "P5",
             resolution: "---",
           },
