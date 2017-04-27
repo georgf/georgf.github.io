@@ -310,14 +310,10 @@ function searchBugs(searchParams, advancedSearch = {}) {
 function joinMultipleBugSearches(searchList) {
   let searchPromises = searchList.map(s => searchBugs(s.searchParams, s.advancedSearch));
   return Promise.all(searchPromises).then(bugLists => {
-    console.log("bugLists: " + JSON.stringify(bugLists));
     let bugMaps = bugLists.map(bl => new Map(bl.map(b => [b.id, b])));
-    console.log("bugMaps: " + JSON.stringify(bugMaps.map(bm => [...bm.entries()])));
     let uniques = new Map();
     bugMaps.forEach(bm => uniques = new Map([...uniques, ...bm]));
-    console.log("uniques: " + JSON.stringify([...uniques.entries()]));
     let joined = [...uniques.values()];
-    console.log("joined: " + JSON.stringify(joined));
     return joined;
   });
 }
