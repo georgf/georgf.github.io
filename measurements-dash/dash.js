@@ -35,121 +35,169 @@ let teamEmails = [
 let bugLists = new Map([
     ["commitments (p1)", {
       category: "active",
-      searchParams: {
-        whiteboard: "[measurement:client]",
-        priority: "P1",
-        resolution: "---",
-      },
+      searches: [
+        {
+          searchParams: {
+            whiteboard: "[measurement:client]",
+            priority: "P1",
+            resolution: "---",
+          },
+        },
+      ],
       columns: ["assigned_to", "cf_fx_points", "summary"],
     }],
     ["potentials (p2)", {
       category: "active",
-      searchParams: {
-        whiteboard: "[measurement:client]",
-        priority: "P2",
-        resolution: "---",
-      },
+      searches: [
+        {
+          searchParams: {
+            whiteboard: "[measurement:client]",
+            priority: "P2",
+            resolution: "---",
+          },
+        },
+      ],
       columns: ["assigned_to", "cf_fx_points", "summary"],
     }],
     ["mentored (wip)", {
       category: "active",
-      searchParams: {
-        resolution: "---",
-        emailtype1: "regexp",
-        email1: teamEmails.join("|"),
-        emailbug_mentor1: "1",
-        emailtype2: "notequals",
-        email2: "nobody@mozilla.org",
-        emailassigned_to2: "1",
-      },
+      searches: [
+        {
+          searchParams: {
+            resolution: "---",
+            emailtype1: "regexp",
+            email1: teamEmails.join("|"),
+            emailbug_mentor1: "1",
+            emailtype2: "notequals",
+            email2: "nobody@mozilla.org",
+            emailassigned_to2: "1",
+          },
+        },
+      ],
       columns: ["assigned_to", "summary", "whiteboard"],
     }],
     ["tracking", {
       category: "active",
-      searchParams: {
-        resolution: "---",
-        whiteboard: "[measurement:client:tracking]",
-      },
+      searches: [
+        {
+          searchParams: {
+            resolution: "---",
+            whiteboard: "[measurement:client:tracking]",
+          },
+        },
+      ],
       columns: ["assigned_to", "summary"],
     }],
     ["uplifts", {
       category: "active",
-      searchParams: {
-        whiteboard: "[measurement:client:uplift]",
-      },
+      searches: [
+        {
+          searchParams: {
+            whiteboard: "[measurement:client:uplift]",
+          },
+        },
+      ],
       columns: ["assigned_to", "summary"],
     }],
     ["project", {
       category: "active",
-      searchParams: {
-        resolution: "---",
-        whiteboard: "[measurement:client:project]",
-      },
+      searches: [
+        {
+          searchParams: {
+            resolution: "---",
+            whiteboard: "[measurement:client:project]",
+          },
+        },
+      ],
       columns: ["summary"],
     }],
     ["backlog, quarter (p3)", {
       category: "p3",
-      searchParams: {
-        whiteboard: "[measurement:client]",
-        priority: "P3",
-        resolution: "---",
-      },
+      searches: [
+        {
+          searchParams: {
+            whiteboard: "[measurement:client]",
+            priority: "P3",
+            resolution: "---",
+          },
+        },
+      ],
       columns: ["assigned_to", "summary", "whiteboard"],
     }],
     ["backlog, year (p4)", {
       category: "p4",
-      searchParams: {
-        whiteboard: "[measurement:client]",
-        priority: "P4",
-        resolution: "---",
-      },
+      searches: [
+        {
+          searchParams: {
+            whiteboard: "[measurement:client]",
+            priority: "P4",
+            resolution: "---",
+          },
+        },
+      ],
       columns: ["assigned_to", "summary", "whiteboard"],
     }],
     ["backlog, low priority", {
       category: "p5",
-      searchParams: {
-        whiteboard: "[measurement:client]",
-        priority: "P5",
-        resolution: "---",
-      },
+      searches: [
+        {
+          searchParams: {
+            whiteboard: "[measurement:client]",
+            priority: "P5",
+            resolution: "---",
+          },
+        },
+      ],
       columns: ["assigned_to", "summary", "whiteboard"],
     }],
     ["mentored (free)", {
       category: "mentored",
-      searchParams: {
-        resolution: "---",
-        emailtype1: "regexp",
-        email1: teamEmails.join("|"),
-        emailbug_mentor1: "1",
-        emailtype2: "equals",
-        email2: "nobody@mozilla.org",
-        emailassigned_to2: "1",
-      },
+      searches: [
+        {
+          searchParams: {
+            resolution: "---",
+            emailtype1: "regexp",
+            email1: teamEmails.join("|"),
+            emailbug_mentor1: "1",
+            emailtype2: "equals",
+            email2: "nobody@mozilla.org",
+            emailassigned_to2: "1",
+          },
+        },
+      ],
       columns: ["summary", "whiteboard"],
     }],
     ["mentees", {
       category: "mentees",
-      searchParams: {
-        emailtype1: "regexp",
-        email1: teamEmails.join("|"),
-        emailbug_mentor1: "1",
-        emailtype2: "notequals",
-        email2: "nobody@mozilla.org",
-        emailassigned_to2: "1",
-      },
-      advancedSearch: {
-        lastChangedNDaysAgo: 30,
-      },
+      searches: [
+        {
+          searchParams: {
+            emailtype1: "regexp",
+            email1: teamEmails.join("|"),
+            emailbug_mentor1: "1",
+            emailtype2: "notequals",
+            email2: "nobody@mozilla.org",
+            emailassigned_to2: "1",
+          },
+          advancedSearch: {
+            lastChangedNDaysAgo: 30,
+          },
+        },
+      ],
       columns: ["assigned_to", "status", "summary", "whiteboard"],
     }],
     ["recent", {
       category: "recent",
-      searchParams: {
-        whiteboard: "[measurement:client]",
-      },
-      advancedSearch: {
-        lastChangedNDaysAgo: 30,
-      },
+      searches: [
+        {
+          searchParams: {
+            whiteboard: "[measurement:client]",
+          },
+          advancedSearch: {
+            lastChangedNDaysAgo: 30,
+          },
+        },
+      ],
       columns: ["last_change_time", "assigned_to", "status", "summary"],
       sortColumn: "last_change_time",
     }],
@@ -221,6 +269,21 @@ function searchBugs(searchParams, advancedSearch = {}) {
 
       resolve(bugs);
     });
+  });
+}
+
+function joinMultipleBugSearches(searchList) {
+  let searchPromises = searchList.map(s => searchBugs(s.searchParams, s.advancedSearch));
+  return Promise.all(searchPromises).then(bugLists => {
+    console.log("bugLists: " + JSON.stringify(bugLists));
+    let bugMaps = bugLists.map(bl => new Map(bl.map(b => [b.id, b])));
+    console.log("bugMaps: " + JSON.stringify(bugMaps.map(bm => [...bm.entries()])));
+    let uniques = new Map();
+    bugMaps.forEach(bm => uniques = new Map([...uniques, ...bm]));
+    console.log("uniques: " + JSON.stringify([...uniques.entries()]));
+    let joined = [...uniques.values()];
+    console.log("joined: " + JSON.stringify(joined));
+    return joined;
   });
 }
 
@@ -332,7 +395,7 @@ function update() {
       continue;
     }
 
-    promise = promise.then(() => searchBugs(listOptions.searchParams, listOptions.advancedSearch))
+    promise = promise.then(() => joinMultipleBugSearches(listOptions.searches))
                      .then(bugs => addBugList(listName, listOptions, bugs));
   }
 }
