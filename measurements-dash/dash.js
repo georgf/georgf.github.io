@@ -50,6 +50,13 @@ let bugLists = new Map([
             resolution: "---",
           },
         },
+        {
+          searchParams: {
+            quicksearch: "product:Toolkit component:Telemetry",
+            priority: "P1",
+            resolution: "---",
+          },
+        },
       ],
       columns: ["assigned_to", "cf_fx_points", "summary"],
     }],
@@ -66,6 +73,13 @@ let bugLists = new Map([
         {
           searchParams: {
             quicksearch: "assigned_to:" + teamEmails.join(","),
+            priority: "P2",
+            resolution: "---",
+          },
+        },
+        {
+          searchParams: {
+            quicksearch: "product:Toolkit component:Telemetry",
             priority: "P2",
             resolution: "---",
           },
@@ -142,6 +156,13 @@ let bugLists = new Map([
             resolution: "---",
           },
         },
+        {
+          searchParams: {
+            quicksearch: "product:Toolkit component:Telemetry",
+            priority: "P3",
+            resolution: "---",
+          },
+        },
       ],
       columns: ["assigned_to", "summary", "whiteboard"],
     }],
@@ -162,6 +183,13 @@ let bugLists = new Map([
             resolution: "---",
           },
         },
+        {
+          searchParams: {
+            quicksearch: "product:Toolkit component:Telemetry",
+            priority: "P4",
+            resolution: "---",
+          },
+        },
       ],
       columns: ["assigned_to", "summary", "whiteboard"],
     }],
@@ -178,6 +206,13 @@ let bugLists = new Map([
         {
           searchParams: {
             quicksearch: "assigned_to:" + teamEmails.join(","),
+            priority: "P5",
+            resolution: "---",
+          },
+        },
+        {
+          searchParams: {
+            quicksearch: "product:Toolkit component:Telemetry",
             priority: "P5",
             resolution: "---",
           },
@@ -235,6 +270,19 @@ let bugLists = new Map([
       ],
       columns: ["last_change_time", "assigned_to", "status", "summary"],
       sortColumn: "last_change_time",
+    }],
+    ["untriaged", {
+      category: "untriaged",
+      searches: [
+        {
+          searchParams: {
+            quicksearch: "product:Toolkit component:Telemetry",
+            priority: "--",
+            resolution: "---",
+          },
+        },
+      ],
+      columns: ["assigned_to", "summary", "whiteboard"],
     }],
 ]);
 
