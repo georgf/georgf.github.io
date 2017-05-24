@@ -327,7 +327,13 @@ function getBugField(bug, field) {
     case "assigned_to":
       return alias(value);
     case "whiteboard":
-      return value.replace("[measurement:client]", "").trim();
+      let strip = [
+        "[measurement:client]",
+        "[measurement:client:tracking]",
+        "[measurement:client:uplift]",
+      ];
+      strip.forEach(s => value = value.replace(s, ""));
+      return value.trim();
     case "summary":
       return (value.length <= 100) ? value : (value.substring(0, 100) +  " ...");
     default: return value;
