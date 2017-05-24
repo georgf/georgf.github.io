@@ -113,8 +113,14 @@ let bugLists = new Map([
             whiteboard: "[measurement:client:tracking]",
           },
         },
+        {
+          searchParams: {
+            quicksearch: "product:Toolkit component:Telemetry whiteboard:[qf",
+            resolution: "---",
+          }
+        }
       ],
-      columns: ["assigned_to", "summary"],
+      columns: ["assigned_to", "summary", "whiteboard"],
     }],
     ["uplifts", {
       category: "active",
