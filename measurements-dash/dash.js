@@ -117,7 +117,8 @@ let bugLists = new Map([
           searchParams: {
             quicksearch: "product:Toolkit component:Telemetry whiteboard:[qf",
             resolution: "---",
-          }
+          },
+          customFilter: bug => !bug.whiteboard.includes("[qf-]"),
         }
       ],
       columns: ["assigned_to", "summary", "whiteboard"],
@@ -349,7 +350,7 @@ function niceFieldName(fieldName) {
   return niceNames.get(fieldName) || fieldName;
 }
 
-function searchBugs(searchParams, advancedSearch = {}) {
+function searchBugs(searchParams, advancedSearch = {}, customFilter = null) {
   return new Promise((resolve, reject) => {
     if ("lastChangedNDaysAgo" in advancedSearch) {
       let days = advancedSearch.lastChangedNDaysAgo;
@@ -362,13 +363,17 @@ function searchBugs(searchParams, advancedSearch = {}) {
         reject(error);
       }
 
+      if (customFilter) {
+        bugs = bugs.filter(customFilter);
+      }
+
       resolve(bugs);
     });
   });
 }
 
 function joinMultipleBugSearches(searchList) {
-  let searchPromises = searchList.map(s => searchBugs(s.searchParams, s.advancedSearch));
+  let searchPromises = searchList.map(s => searchBugs(s.searchParams, s.advancedSearch, s.customFilter));
   return Promise.all(searchPromises).then(bugLists => {
     let bugMaps = bugLists.map(bl => new Map(bl.map(b => [b.id, b])));
     let uniques = new Map();
