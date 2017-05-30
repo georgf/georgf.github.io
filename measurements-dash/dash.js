@@ -30,6 +30,7 @@ let teamEmails = [
   "chutten@mozilla.com",
   "gfritzsche@mozilla.com",
   "alessio.placitelli@gmail.com",
+  "flyinggrub@gmail.com",
 ];
 
 let bugLists = new Map([
@@ -307,6 +308,7 @@ function alias(email) {
     ["areinald.bug@bolet.no-ip.com", "areinald"],
     ["penhlenh@gmail.com", "penh lenh"],
     ["pineapple.rice@gmail.com", "eric hu"],
+    ["flyinggrub@gmail.com", "flyingrub"],
     ["nobody@mozilla.org", "-"],
   ]);
 
