@@ -276,6 +276,14 @@ let bugLists = new Map([
             lastChangedNDaysAgo: 30,
           },
         },
+        {
+          searchParams: {
+            quicksearch: "product:Toolkit component:Telemetry",
+          },
+          advancedSearch: {
+            lastChangedNDaysAgo: 30,
+          },
+        },
       ],
       columns: ["last_change_time", "assigned_to", "status", "summary"],
       sortColumn: "last_change_time",
@@ -286,6 +294,13 @@ let bugLists = new Map([
         {
           searchParams: {
             quicksearch: "product:Toolkit component:Telemetry",
+            priority: "--",
+            resolution: "---",
+          },
+        },
+        {
+          searchParams: {
+            whiteboard: "[measurement:client]",
             priority: "--",
             resolution: "---",
           },
