@@ -37,6 +37,7 @@ let teamEmails = [
 let bugLists = new Map([
     ["commitments (p1)", {
       category: "active",
+      columns: ["assigned_to", "cf_fx_points", "summary", "whiteboard"],
       searches: [
         {
           searchParams: {
@@ -60,10 +61,10 @@ let bugLists = new Map([
           },
         },
       ],
-      columns: ["assigned_to", "cf_fx_points", "summary"],
     }],
     ["potentials (p2)", {
       category: "active",
+      columns: ["assigned_to", "cf_fx_points", "summary", "whiteboard"],
       searches: [
         {
           searchParams: {
@@ -87,7 +88,6 @@ let bugLists = new Map([
           },
         },
       ],
-      columns: ["assigned_to", "cf_fx_points", "summary"],
     }],
     ["mentored (wip)", {
       category: "active",
