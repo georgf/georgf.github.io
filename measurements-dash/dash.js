@@ -32,6 +32,7 @@ let teamEmails = [
   "alessio.placitelli@gmail.com",
   "flyinggrub@gmail.com",
   "kustiuzhanina@mozilla.com",
+  "alexrs95@gmail.com",
 ];
 
 let bugLists = new Map([
@@ -326,6 +327,7 @@ function alias(email) {
     ["pineapple.rice@gmail.com", "eric hu"],
     ["flyinggrub@gmail.com", "flyingrub"],
     ["kustiuzhanina@mozilla.com", "kate"],
+    ["alexrs95@gmail.com", "alejandro"],
     ["nobody@mozilla.org", "-"],
   ]);
 
