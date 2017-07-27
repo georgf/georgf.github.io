@@ -30,11 +30,7 @@ function promiseGetJSON(file) {
 }
 
 $(document).ready(function() {
-  $.ajaxSetup({
-    cache:false
-  });
-
-  mark("request json");
+  mark("document ready");
 
   var loads = [
     promiseGetJSON("general.json"),
