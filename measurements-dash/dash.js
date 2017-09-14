@@ -24,7 +24,8 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 "use strict";
 
 let gCategory;
-let bugzilla = bz.createClient();
+const bugzilla = bz.createClient();
+const gh = new GitHub();
 
 let teamEmails = [
   "chutten@mozilla.com",
@@ -33,6 +34,21 @@ let teamEmails = [
   "flyinggrub@gmail.com",
   "kustiuzhanina@mozilla.com",
   "alexrs95@gmail.com",
+];
+
+const githubProjects = [
+  {
+    user: "mozilla",
+    project: "medusa",
+  },
+  {
+    user: "mozilla",
+    project: "cerberus",
+  },
+  {
+    user: "mozilla",
+    project: "telemetry-dashboard",
+  },
 ];
 
 let bugLists = new Map([
@@ -61,6 +77,16 @@ let bugLists = new Map([
             resolution: "---",
           },
         },
+        ... githubProjects.map(p => ({
+          searchParams: {
+            type: "github",
+            user: p.user,
+            project: p.project,
+            filters: {
+              label: "priority:1",
+            },
+          },
+        })),
       ],
     }],
     ["potentials (p2)", {
@@ -88,6 +114,16 @@ let bugLists = new Map([
             resolution: "---",
           },
         },
+        ... githubProjects.map(p => ({
+          searchParams: {
+            type: "github",
+            user: p.user,
+            project: p.project,
+            filters: {
+              label: "priority:2",
+            },
+          },
+        })),
       ],
     }],
     ["mentored (wip)", {
@@ -289,8 +325,8 @@ let bugLists = new Map([
       columns: ["last_change_time", "assigned_to", "status", "summary"],
       sortColumn: "last_change_time",
     }],
-    ["untriaged", {
-      category: "untriaged",
+    ["client untriaged", {
+      category: "client_untriaged",
       searches: [
         {
           searchParams: {
@@ -308,6 +344,22 @@ let bugLists = new Map([
         },
       ],
       columns: ["assigned_to", "summary", "whiteboard"],
+    }],
+    ["tmo untriaged", {
+      category: "tmo_untriaged",
+      searches: [
+        ... githubProjects.map(p => ({
+          searchParams: {
+            type: "github",
+            user: p.user,
+            project: p.project,
+            filters: {
+              noPriority: true,
+            },
+          },
+        })),
+      ],
+      columns: ["assigned_to", "summary", "whiteboard", "priority"],
     }],
 ]);
 
@@ -371,26 +423,97 @@ function niceFieldName(fieldName) {
   return niceNames.get(fieldName) || fieldName;
 }
 
-function searchBugs(searchParams, advancedSearch = {}, customFilter = null) {
-  return new Promise((resolve, reject) => {
-    if ("lastChangedNDaysAgo" in advancedSearch) {
-      let days = advancedSearch.lastChangedNDaysAgo;
-      let date = futureDate(new Date(), - (days * MS_IN_A_DAY));
-      searchParams.last_change_time = date.toISOString().substring(0, 10);
+async function searchGithubProjectForBugs(searchParams) {
+  let issue = gh.getIssues(searchParams.user, searchParams.project);
+  let response = await issue.listIssues({state: "open"});
+  console.log("response:", response);
+
+  let filtered = response.data;
+  if ("filters" in searchParams) {
+    let filters = searchParams.filters;
+
+    if (filters.label) {
+      filtered = filtered.filter(is => {
+        let s = new Set(is.labels.map(l => l.name));
+        if (!s.has(searchParams.filters.label)) {
+          return false;
+        }
+        return true;
+      });
     }
 
-    bugzilla.searchBugs(searchParams, (error, bugs) => {
-      if (error) {
-        reject(error);
-      }
+    if (filters.noPriority) {
+      filtered = filtered.filter(is => {
+        return !is.labels.find(l => l.name.match(/^priority:[0-9]$/));
+      });
+    }
+  }
 
-      if (customFilter) {
-        bugs = bugs.filter(customFilter);
-      }
+  let mapped = filtered.map(is => {
+    let assignee = (is.assignee != null) ? is.assignee.login : "nobody@mozilla.org";
+    let priority = "--";
+    let priorityLabel = is.labels.find(l => l.name.match(/^priority:[0-9]$/));
+    if (priorityLabel) {
+      priority = "P" + priorityLabel.name.split(":")[1];
+    }
 
-      resolve(bugs);
-    });
+    return {
+      "id": "gh:" + is.id,
+      "assigned_to": assignee,
+      "cf_fx_points": "---",
+      "summary": is.title,
+      "last_change_time": is.updated_at,
+      "type": "github",
+      "url": is.html_url,
+      "whiteboard": "",
+      "priority": priority,
+    };
   });
+  console.log("mapped:", mapped);
+
+  return mapped;
+}
+
+async function searchBugs(searchParams, advancedSearch = {}, customFilter = null) {
+  console.log("searchBugs - advancedSearch:", advancedSearch);
+  console.log("searchBugs - customFilter:", customFilter);
+
+  if ("lastChangedNDaysAgo" in advancedSearch) {
+    let days = advancedSearch.lastChangedNDaysAgo;
+    let date = futureDate(new Date(), - (days * MS_IN_A_DAY));
+    searchParams.last_change_time = date.toISOString().substring(0, 10);
+  }
+
+  let searchPromise;
+  switch (searchParams.type) {
+  case "github":
+    searchPromise = searchGithubProjectForBugs(searchParams);
+    break;
+  case "bugzilla":
+  default:
+    searchPromise = new Promise((resolve, reject) => {
+      bugzilla.searchBugs(searchParams, (error, bugs) => {
+        if (error) {
+          reject(error);
+        }
+
+        resolve(bugs.map(b => {
+          b.url = "https://bugzilla.mozilla.org/show_bug.cgi?id=" + b.id;
+          b.type = "bugzilla";
+          return b;
+        }));
+      });
+    });
+  }
+
+  let bugs = await searchPromise;
+  console.log(`got ${bugs.length} bugs`);
+  if (customFilter) {
+    bugs = bugs.filter(customFilter);
+  }
+  console.log("filtered bugs:", bugs);
+
+  return bugs;
 }
 
 function joinMultipleBugSearches(searchList) {
@@ -491,7 +614,7 @@ function addBugList(listName, listOptions, bugs) {
   ]));
 
   for (let bug of bugs) {
-    let url = "https://bugzilla.mozilla.org/show_bug.cgi?id=" + bug.id;
+    let url = bug.url;
     table.appendChild(createTableRow([
       (cell) => cell.appendChild(createLink("#", url)),
       ...[for (f of bugFields) getBugField(bug, f)],
