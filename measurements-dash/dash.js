@@ -361,7 +361,7 @@ let bugLists = new Map([
       columns: ["assigned_to", "summary", "whiteboard"],
     }],
     ... ["1", "2", "3", "4"].map(priority => [
-      "tmo p" + priority, 
+      "tmo p" + priority,
       {
         category: "tmo",
         searches: [
@@ -474,7 +474,6 @@ function niceFieldName(fieldName) {
 async function searchGithubProjectForBugs(searchParams) {
   let issue = gh.getIssues(searchParams.user, searchParams.project);
   let response = await issue.listIssues({state: "open"});
-  console.log("response:", response);
 
   let filtered = response.data;
   if ("filters" in searchParams) {
@@ -517,15 +516,11 @@ async function searchGithubProjectForBugs(searchParams) {
       "priority": priority,
     };
   });
-  console.log("mapped:", mapped);
 
   return mapped;
 }
 
 async function searchBugs(searchParams, advancedSearch = {}, customFilter = null) {
-  console.log("searchBugs - advancedSearch:", advancedSearch);
-  console.log("searchBugs - customFilter:", customFilter);
-
   if ("lastChangedNDaysAgo" in advancedSearch) {
     let days = advancedSearch.lastChangedNDaysAgo;
     let date = futureDate(new Date(), - (days * MS_IN_A_DAY));
@@ -555,11 +550,9 @@ async function searchBugs(searchParams, advancedSearch = {}, customFilter = null
   }
 
   let bugs = await searchPromise;
-  console.log(`got ${bugs.length} bugs`);
   if (customFilter) {
     bugs = bugs.filter(customFilter);
   }
-  console.log("filtered bugs:", bugs);
 
   return bugs;
 }
