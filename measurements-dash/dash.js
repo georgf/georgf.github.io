@@ -36,7 +36,7 @@ let teamEmails = [
   "alexrs95@gmail.com",
 ];
 
-const githubProjects = [
+const tmoGithubProjects = [
   {
     user: "mozilla",
     project: "medusa",
@@ -48,6 +48,21 @@ const githubProjects = [
   {
     user: "mozilla",
     project: "telemetry-dashboard",
+  },
+];
+
+const tmoBugzillaProjects = [
+  {
+    product: "Webtools",
+    component: "Telemetry Dashboard",
+  },
+  {
+    product: "Data Platform and Tools",
+    component: "Datasets: Telemetry Aggregates",
+  },
+  {
+    product: "Data Platform and Tools",
+    component: "Telemetry Aggregation Service",
   },
 ];
 
@@ -77,7 +92,7 @@ let bugLists = new Map([
             resolution: "---",
           },
         },
-        ... githubProjects.map(p => ({
+        ... tmoGithubProjects.map(p => ({
           searchParams: {
             type: "github",
             user: p.user,
@@ -114,7 +129,7 @@ let bugLists = new Map([
             resolution: "---",
           },
         },
-        ... githubProjects.map(p => ({
+        ... tmoGithubProjects.map(p => ({
           searchParams: {
             type: "github",
             user: p.user,
@@ -345,10 +360,36 @@ let bugLists = new Map([
       ],
       columns: ["assigned_to", "summary", "whiteboard"],
     }],
+    ... ["1", "2", "3", "4"].map(priority => [
+      "tmo p" + priority, 
+      {
+        category: "tmo",
+        searches: [
+          ... tmoGithubProjects.map(p => ({
+            searchParams: {
+              type: "github",
+              user: p.user,
+              project: p.project,
+              filters: {
+                label: "priority:" + priority,
+              },
+            },
+          })),
+          ... tmoBugzillaProjects.map(p => ({
+            searchParams: {
+              quicksearch: `product:"${p.product}" component:"${p.component}"`,
+              priority: "P" + priority,
+              resolution: "---",
+            },
+          })),
+        ],
+        columns: ["assigned_to", "summary", "whiteboard", "priority"],
+      }
+    ]),
     ["tmo untriaged", {
       category: "tmo_untriaged",
       searches: [
-        ... githubProjects.map(p => ({
+        ... tmoGithubProjects.map(p => ({
           searchParams: {
             type: "github",
             user: p.user,
@@ -356,6 +397,13 @@ let bugLists = new Map([
             filters: {
               noPriority: true,
             },
+          },
+        })),
+        ... tmoBugzillaProjects.map(p => ({
+          searchParams: {
+            quicksearch: `product:"${p.product}" component:"${p.component}"`,
+            priority: "--",
+            resolution: "---",
           },
         })),
       ],
