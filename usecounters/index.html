@@ -79,7 +79,7 @@ relative to
 </select>
 counts.
 <br/>
-The data comes from Firefox <span id="version"></span> <span id="channel"></span>.
+The data comes from Firefox <span id="version">...</span> <span id="channel">...</span>. It was collected from <span id="page_count">...</span> top level pages and <span id="document_count">...</span> individual documents.
 
 <div class="chart"></div>
 
@@ -312,6 +312,8 @@ async function update() {
 async function initUI() {
   $('#version').text(version);
   $('#channel').text(channel);
+  $('#page_count').text(await getHistogramSum("TOP_LEVEL_CONTENT_DOCUMENTS_DESTROYED"));
+  $('#document_count').text(await getHistogramSum("CONTENT_DOCUMENTS_DESTROYED"));
 
   let metrics = await getMetrics();
   let groups = new Set(metrics.map(m => m.split('_')[2]));
