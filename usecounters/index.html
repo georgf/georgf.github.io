@@ -63,23 +63,30 @@ td {
   padding: 5px;
 }
 
+#details {
+  font-size: 85%;
+}
+
 </style>
 
 </head>
 
 <body>
 
-Show <a href="https://firefox-source-docs.mozilla.org/toolkit/components/telemetry/telemetry/collection/use-counters.html">use counters</a>
-for group
-<select class="groups"></select>
-relative to
-<select class="kind">
-  <option value="page">page (toplevel)</option>
-  <option value="document">document</option>
-</select>
-counts.
-<br/>
-The data comes from Firefox <span id="version">...</span> <span id="channel">...</span>. It was collected from <span id="page_count">...</span> top level pages and <span id="document_count">...</span> individual documents.
+<p id="selection">
+    Show <a href="https://firefox-source-docs.mozilla.org/toolkit/components/telemetry/telemetry/collection/use-counters.html">use counters</a>
+    for group
+    <select class="groups"></select>
+    relative to
+    <select class="kind">
+      <option value="page">page (toplevel)</option>
+      <option value="document">document</option>
+    </select>
+    counts.
+</p>
+<p id="details">
+    The data comes from Firefox <span id="version">...</span> <span id="channel">...</span>. It was collected from <span id="page_count">...</span> top level pages and <span id="document_count">...</span> individual documents.
+</p>
 
 <div class="chart"></div>
 
