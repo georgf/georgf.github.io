@@ -212,6 +212,12 @@ async function getHistogramSum(metric) {
   return sum;
 }
 
+function strippedUseCounterName(uc) {
+  let kind = $('.kind').val();
+  return uc.replace(/^USE_COUNTER2_/, '')
+           .replace(kind == 'page' ? /_PAGE$/ : /_DOCUMENT$/, '');
+}
+
 async function addChart(metrics) {
   let totalCount = await getTotalCount();
 
@@ -219,7 +225,7 @@ async function addChart(metrics) {
   for (let m of metrics) {
     let sum = await getHistogramSum(m);
     sums.push({
-      label: m.replace(/^USE_COUNTER2_/, ''),
+      label: strippedUseCounterName(m),
       value: pct(sum, totalCount).toFixed(5)
     });
   }
@@ -270,7 +276,7 @@ async function addTable(metrics) {
   for (let m of metrics) {
     let sum = await getHistogramSum(m);
     sums.push([
-      m.replace(/^USE_COUNTER2_/, ''),
+      strippedUseCounterName(m),
       pct(sum, totalCount).toFixed(5),
       sum
     ]);
