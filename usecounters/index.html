@@ -78,6 +78,8 @@ relative to
   <option value="page">page (toplevel)</option>
 </select>
 counts.
+<br/>
+The data comes from Firefox <span id="version"></span> <span id="channel"></span>.
 
 <div class="chart"></div>
 
@@ -183,11 +185,14 @@ function renderBars(data) {
 
 <script>
 
+const channel = "beta";
+const version = "57";
+
 var metricsCache = null;
 
 async function getMetrics() {
   if (!metricsCache) {
-    let filterOptions = await new Promise(r => Telemetry.getFilterOptions("beta", "57", r));
+    let filterOptions = await new Promise(r => Telemetry.getFilterOptions(channel, version, r));
     metricsCache = filterOptions.metric;
   }
 
@@ -202,7 +207,7 @@ async function getHistogramSum(metric) {
   }
 
   let filters = {};
-  let evo = await new Promise(r => Telemetry.getEvolution("beta", "57", metric, filters, false, r));
+  let evo = await new Promise(r => Telemetry.getEvolution(channel, version, metric, filters, false, r));
   let sum = 0;
   if ("" in evo) {
     sum = evo[""].histogram().sum;
@@ -304,7 +309,10 @@ async function update() {
   await addTable(metrics);
 }
 
-async function initOptions() {
+async function initUI() {
+  $('#version').text(version);
+  $('#channel').text(channel);
+
   let metrics = await getMetrics();
   let groups = new Set(metrics.map(m => m.split('_')[2]));
 
@@ -321,7 +329,7 @@ async function initOptions() {
 
 async function start() {
   await new Promise(r => Telemetry.init(r));
-  await initOptions();
+  await initUI();
   await update();
 }
 
