@@ -182,6 +182,7 @@ async function addTable(metrics) {
   }
 
   await Promise.all(promises);
+  sums.sort((a, b) => a.shortName.localeCompare(b.shortName));
 
   let table = createTable(sums);
   $('.data').append(table);
@@ -211,7 +212,8 @@ async function initUI() {
   $('#document_count').text(docCount.toLocaleString());
 
   let metrics = await getMetrics();
-  let groups = new Set(metrics.map(m => m.split('_')[2]));
+  let groups = [...new Set(metrics.map(m => m.split('_')[2]))];
+  groups = groups.sort((a, b) => a.localeCompare(b));
 
   for (let g of groups) {
     $('.groups').append($('<option>', {
