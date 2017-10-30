@@ -9,53 +9,16 @@ body {
   position: relative;
 }
 
-svg {
-  width: 100%;
-  height: 100%;
-  position: center;
-}
-
-.toolTip {
-  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-  position: absolute;
-  display: none;
-  width: auto;
-  height: auto;
-  background: none repeat scroll 0 0 white;
-  border: 0 none;
-  border-radius: 8px 8px 8px 8px;
-  box-shadow: -3px 3px 15px #888888;
-  color: black;
-  font: 12px sans-serif;
-  padding: 5px;
-  text-align: center;
-}
-
-text {
-  font: 15px sans-serif;
-  color: white;
-}
-text.value {
-  font-size: 100%;
-  fill: white;
-}
-
-.axisHorizontal path{
-  fill: none;
-}
-
-.axisHorizontal .tick line {
-  stroke-width: 1;
-  stroke: rgba(0, 0, 0, 0.2);
-}
-
-.bar {
-  fill: steelblue;
-  fill-opacity: .9;
+#details {
+  font-size: 85%;
 }
 
 .data {
     margin: 10px;
+}
+
+table {
+  border-spacing: 3px;
 }
 
 td {
@@ -63,8 +26,19 @@ td {
   padding: 5px;
 }
 
-#details {
-  font-size: 85%;
+.percentCell {
+  text-align: right;
+}
+
+.barCell {
+  vertical-align: center;
+  padding: 0px;
+}
+
+.barCell > svg {
+  width: 400px;
+  height: 18px;
+  margin: 0px;
 }
 
 </style>
@@ -88,106 +62,9 @@ td {
     The data comes from Firefox <span id="version">...</span> <span id="channel">...</span>. It was collected from <span id="page_count">...</span> top level pages and <span id="document_count">...</span> individual documents.
 </p>
 
-<div class="chart"></div>
-
 <div class="data"></div>
 
-<script src="http://d3js.org/d3.v3.min.js"></script>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
-
-<script>
-
-function renderBars(data) {
-    var div = d3.select(".chart").attr("class", "toolTip");
-
-    var axisMargin = 20,
-    margin = 40,
-    valueMargin = 4,
-    width = parseInt(d3.select('body').style('width'), 10),
-    height = parseInt(d3.select('body').style('height'), 10),
-    barHeight = (height-axisMargin-margin*2)* 0.4/data.length,
-    barPadding = (height-axisMargin-margin*2)*0.6/data.length,
-    data, bar, svg, scale, xAxis, labelWidth = 0;
-
-    max = d3.max(data, function(d) { return d.value; });
-
-    svg = d3.select('body')
-    .append("svg")
-    .attr("width", width)
-    .attr("height", height);
-
-
-    bar = svg.selectAll("g")
-    .data(data)
-    .enter()
-    .append("g");
-
-    bar.attr("class", "bar")
-    .attr("cx",0)
-    .attr("transform", function(d, i) {
-        return "translate(" + margin + "," + (i * (barHeight + barPadding) + barPadding) + ")";
-    });
-
-    bar.append("text")
-    .attr("class", "label")
-    .attr("y", barHeight / 2)
-        .attr("dy", ".35em") //vertical align middle
-        .text(function(d){
-            return d.label;
-        }).each(function() {
-            labelWidth = Math.ceil(Math.max(labelWidth, this.getBBox().width));
-        });
-
-        scale = d3.scale.linear()
-        .domain([0, max])
-        .range([0, width - margin*2 - labelWidth]);
-
-        xAxis = d3.svg.axis()
-        .scale(scale)
-        .tickSize(-height + 2*margin + axisMargin)
-        .orient("bottom");
-
-        bar.append("rect")
-        .attr("transform", "translate("+labelWidth+", 0)")
-        .attr("height", barHeight)
-        .attr("width", function(d){
-            return scale(d.value);
-        });
-
-        bar.append("text")
-        .attr("class", "value")
-        .attr("y", barHeight / 2)
-        .attr("dx", -valueMargin + labelWidth) //margin right
-        .attr("dy", ".35em") //vertical align middle
-        .attr("text-anchor", "end")
-        .text(function(d){
-            return (d.value+"%");
-        })
-        .attr("x", function(d){
-            var width = this.getBBox().width;
-            return Math.max(width + valueMargin, scale(d.value));
-        });
-
-        bar
-        .on("mousemove", function(d){
-            div.style("left", d3.event.pageX+10+"px");
-            div.style("top", d3.event.pageY-25+"px");
-            div.style("display", "inline-block");
-            div.html((d.label)+"<br>"+(d.value)+"%");
-        });
-        bar
-        .on("mouseout", function(d){
-            div.style("display", "none");
-        });
-
-        svg.insert("g",":first-child")
-        .attr("class", "axisHorizontal")
-        .attr("transform", "translate(" + (margin + labelWidth) + ","+ (height - axisMargin - margin)+")")
-        .call(xAxis);
-}
-
-</script>
-
 <script src="https://telemetry.mozilla.org/v2/telemetry.js"></script>
 
 <script>
@@ -226,43 +103,51 @@ async function getHistogramSum(metric) {
 
 function strippedUseCounterName(uc) {
   let kind = $('.kind').val();
-  return uc.replace(/^USE_COUNTER2_/, '')
-           .replace(kind == 'page' ? /_PAGE$/ : /_DOCUMENT$/, '');
+  let group = $('.groups').val();
+  let regexPrefix = new RegExp('^USE_COUNTER2_' + group + '_');
+  let regexSuffix = new RegExp('_' + kind.toUpperCase());
+  return uc.replace(regexPrefix, '')
+           .replace(regexSuffix, '');
 }
 
-async function addChart(metrics) {
-  let totalCount = await getTotalCount();
-
-  let sums = [];
-  for (let m of metrics) {
-    let sum = await getHistogramSum(m);
-    sums.push({
-      label: strippedUseCounterName(m),
-      value: pct(sum, totalCount).toFixed(5)
-    });
-  }
-
-  renderBars(sums);
-}
-
-function createTable(header, data) {
+function createTable(data) {
   let table = document.createElement('table');
-
-  let tr = document.createElement('tr');
-  for (let e of header) {
-    let th = document.createElement('th');
-    th.appendChild(document.createTextNode(e));
-    tr.appendChild(th);
-  }
-  table.appendChild(tr);
 
   for (let d of data) {
     let tr = document.createElement('tr');
-    for (let e of d) {
-        let td = document.createElement('td');
-        td.appendChild(document.createTextNode(e));
-        tr.appendChild(td);
-    }
+
+    // Add name.
+    let td = document.createElement('td');
+    td.appendChild(document.createTextNode(d.shortName));
+    td.setAttribute('title', d.metric);
+    tr.appendChild(td);
+
+    // Add percentage.
+    td = document.createElement('td');
+    td.appendChild(document.createTextNode(`${d.percentage.toFixed(3)}%`));
+    td.className += 'percentCell';
+    td.setAttribute('title', `${d.count.toLocaleString()} of total loads`);
+    tr.appendChild(td);
+
+    // Create bar cell.
+
+    td = document.createElement('td');
+    td.className += 'barCell';
+    td.setAttribute('title', `${d.percentage.toFixed(3)}%`);
+
+    const svgNs = "http://www.w3.org/2000/svg";
+    let svg = document.createElementNS(svgNs, "svg");
+
+    let rect = document.createElementNS(svgNs, 'rect');
+    rect.setAttribute('x', 0);
+    rect.setAttribute('y', 0);
+    rect.setAttribute('width', Math.min(400, Math.round(4 * d.percentage)));
+    rect.setAttribute('height', 100);
+    rect.setAttribute('fill', 'steelblue');
+    svg.appendChild(rect);
+
+    td.appendChild(svg);
+    tr.appendChild(td);
 
     table.appendChild(tr);
   }
@@ -287,24 +172,23 @@ async function addTable(metrics) {
   let promises = [];
   let sums = [];
   for (let m of metrics) {
-    let p = getHistogramSum(m).then(sum => sums.push([
-      strippedUseCounterName(m),
-      pct(sum, totalCount).toFixed(5),
-      sum
-    ]));
+    let p = getHistogramSum(m).then(sum => sums.push({
+      shortName: strippedUseCounterName(m),
+      metric: m,
+      percentage: pct(sum, totalCount),
+      count: sum,
+    }));
     promises.push(p);
   }
 
   await Promise.all(promises);
 
-  let table = createTable(['metric', '%', 'count'], sums);
+  let table = createTable(sums);
   $('.data').append(table);
 }
 
 async function update() {
   $('.data').empty();
-  $('.chart').empty();
-  $('svg').remove();
 
   let kind = $('.kind').val();
   let group = $('.groups').val();
@@ -315,15 +199,16 @@ async function update() {
                   .filter(m => m.startsWith("USE_COUNTER2_" + group + "_"));
   console.log("metrics:", metrics.join(', '));
 
-  await addChart(metrics);
   await addTable(metrics);
 }
 
 async function initUI() {
   $('#version').text(version);
   $('#channel').text(channel);
-  $('#page_count').text(await getHistogramSum("TOP_LEVEL_CONTENT_DOCUMENTS_DESTROYED"));
-  $('#document_count').text(await getHistogramSum("CONTENT_DOCUMENTS_DESTROYED"));
+  let topLevelCount = await getHistogramSum("TOP_LEVEL_CONTENT_DOCUMENTS_DESTROYED");
+  let docCount = await getHistogramSum("CONTENT_DOCUMENTS_DESTROYED");
+  $('#page_count').text(topLevelCount.toLocaleString());
+  $('#document_count').text(docCount.toLocaleString());
 
   let metrics = await getMetrics();
   let groups = new Set(metrics.map(m => m.split('_')[2]));
