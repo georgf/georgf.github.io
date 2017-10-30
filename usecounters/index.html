@@ -284,15 +284,18 @@ async function getTotalCount() {
 async function addTable(metrics) {
   let totalCount = await getTotalCount();
 
+  let promises = [];
   let sums = [];
   for (let m of metrics) {
-    let sum = await getHistogramSum(m);
-    sums.push([
+    let p = getHistogramSum(m).then(sum => sums.push([
       strippedUseCounterName(m),
       pct(sum, totalCount).toFixed(5),
       sum
-    ]);
+    ]));
+    promises.push(p);
   }
+
+  await Promise.all(promises);
 
   let table = createTable(['metric', '%', 'count'], sums);
   $('.data').append(table);
