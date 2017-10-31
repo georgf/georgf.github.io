@@ -192,12 +192,17 @@ async function addTable(metrics) {
   $('.data').append(table);
 }
 
+function makeHash(kind, group) {
+  window.location.hash = `#kind=${encodeURIComponent(kind)}&group=${encodeURIComponent(group)}`;
+}
+
 async function update() {
   $('.data').empty();
 
   let kind = $('.kind').val();
   let group = $('.groups').val();
   console.log("group:", group);
+  makeHash(kind, group);
 
   let metrics = (await getMetrics())
                   .filter(m => m.endsWith("_" + kind.toUpperCase()))
@@ -205,6 +210,22 @@ async function update() {
   console.log("metrics:", metrics.join(', '));
 
   await addTable(metrics);
+}
+
+function parseQueryString() {
+  let params = new Map;
+  for (let pair of window.location.hash.substring(1).split('&')) {
+    let [key, value] = pair.split('=');
+    params.set(key, decodeURIComponent(value));
+  }
+
+  if (params.has('kind')) {
+    $('.kind').val(params.get('kind'));
+  }
+
+  if (params.has('group')) {
+    $('.groups').val(params.get('group'));
+  }
 }
 
 async function initUI() {
@@ -225,6 +246,8 @@ async function initUI() {
       text: g,
     }));
   }
+
+  parseQueryString();
 
   $('.groups').change(update);
   $('.kind').change(update);
