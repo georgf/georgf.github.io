@@ -14,7 +14,7 @@ body {
 }
 
 .data {
-    margin: 10px;
+  margin: 10px;
 }
 
 table {
@@ -37,6 +37,7 @@ td {
 .barCell {
   vertical-align: center;
   padding: 0px;
+  background-color: #FFFFFF;
 }
 
 .barCell > svg {
@@ -142,13 +143,25 @@ function createTable(data) {
     const svgNs = "http://www.w3.org/2000/svg";
     let svg = document.createElementNS(svgNs, "svg");
 
+    let usedRectWidth = Math.min(400, Math.round(4 * d.percentage));
+
     let rect = document.createElementNS(svgNs, 'rect');
     rect.setAttribute('x', 0);
     rect.setAttribute('y', 0);
-    rect.setAttribute('width', Math.min(400, Math.round(4 * d.percentage)));
+    rect.setAttribute('width', usedRectWidth);
     rect.setAttribute('height', 100);
     rect.setAttribute('fill', 'steelblue');
     svg.appendChild(rect);
+
+    if (usedRectWidth < 400) {
+      let rect = document.createElementNS(svgNs, 'rect');
+      rect.setAttribute('x', usedRectWidth);
+      rect.setAttribute('y', 0);
+      rect.setAttribute('width', 400 - usedRectWidth);
+      rect.setAttribute('height', 100);
+      rect.setAttribute('fill', '#F0F0F0');
+      svg.appendChild(rect);
+    }
 
     td.appendChild(svg);
     tr.appendChild(td);
