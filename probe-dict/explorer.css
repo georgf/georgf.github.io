@@ -1,0 +1,47 @@
+
+body {
+    margin: 0px;
+    padding 0px;
+    min-height: 75rem;
+}
+
+#github-banner img {
+    position: absolute;
+    top: 0;
+    right: 0;
+    border: 0;
+    z-index: 15;
+}
+
+#loading-overlay {
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    right: 0;
+    background: #000;
+    opacity: 0.7;
+    filter: alpha(opacity=70);
+    z-index: 14;
+}
+
+#loading-anim {
+    width: 220px;
+    height: 19px;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    margin: -9px 0 0 -110px;
+}
+
+#probe-detail-view {
+    padding-top: 20px;
+}
+
+#detail-probe-name {
+    display: inline;
+}
+
+.hidden {
+    display: none;
+}
