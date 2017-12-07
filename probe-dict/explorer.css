@@ -45,8 +45,32 @@ body {
     display: none;
 }
 
+#stats {
+    font-style: italic;
+    font-size: 90%;
+    margin-bottom: 10px;
+}
+
+#measurements {
+    padding-left: 0px !important;
+}
+
+#search-results-table {
+    width: 100%;
+}
+
 #search-results-table td {
     cursor: pointer;
+    white-space: nowrap;
+}
+
+.search-results-field-name,
+.search-results-field-description {
+    max-width: 400px;
+    min-width: 200px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 #search-results-table tr th:first-child {
