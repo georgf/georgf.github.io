@@ -2,7 +2,7 @@
 <head>
 <meta charset="utf-8">
 <style>
-body {
+#content {
   font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
   width: 960px;
   height: 500px;
@@ -46,63 +46,122 @@ td {
   margin: 0px;
 }
 
+#loading-overlay {
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    right: 0;
+    background: #000;
+    opacity: 0.7;
+    filter: alpha(opacity=70);
+    z-index: 14;
+}
+
+#loading-anim {
+    width: 220px;
+    height: 19px;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    margin: -9px 0 0 -110px;
+}
+
+.hidden {
+    display: none;
+}
+
 </style>
 
 </head>
 
 <body>
 
-<p id="selection">
-    Show <a href="https://firefox-source-docs.mozilla.org/toolkit/components/telemetry/telemetry/collection/use-counters.html">use counters</a>
-    for group
-    <select class="groups"></select>
-    relative to
-    <select class="kind">
-      <option value="page">page (toplevel)</option>
-      <option value="document">document</option>
-    </select>
-    counts.
-</p>
-<p id="details">
-    The data comes from Firefox <span id="version">...</span> <span id="channel">...</span>. It was collected from <span id="page_count">...</span> top level pages and <span id="document_count">...</span> individual documents.
-</p>
+<div id="loading-overlay">
+  <img id="loading-anim" src="loading.gif">
+</div>
 
-<div class="data"></div>
+<div id="content">
+  <p id="selection">
+      Show <a href="https://firefox-source-docs.mozilla.org/toolkit/components/telemetry/telemetry/collection/use-counters.html">use counters</a>
+      for group
+      <select class="groups"></select>
+      relative to
+      <select class="kind">
+        <option value="page">page (toplevel)</option>
+        <option value="document">document</option>
+      </select>
+      counts.
+  </p>
+
+  <p id="details">
+    <form>
+      The data comes from Firefox
+      <select id="select_version">...</select>
+      <select id="select_channel">
+        <option value="beta">beta</option>
+        <option value="nightly">nightly</option>
+      </select>.
+      It was collected from <span id="page_count">...</span> top level page loads and <span id="document_count">...</span> individual document loads.
+    </form>
+  </p>
+
+  <div class="data"></div>
+</div>
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 <script src="https://telemetry.mozilla.org/v2/telemetry.js"></script>
 
 <script>
 
-const channel = "beta";
-const version = "57";
+// Use counters are only collected from prerelease channels.
+const gValidChannels = ["beta", "nightly"];
 
-var metricsCache = null;
+// Map() of (channel -> version).
+var gAvailableVersions = null;
 
-async function getMetrics() {
-  if (!metricsCache) {
-    let filterOptions = await new Promise(r => Telemetry.getFilterOptions(channel, version, r));
-    metricsCache = filterOptions.metric;
-  }
-
-  return metricsCache.filter(m => m.startsWith("USE_COUNTER2_"));
-}
-
+// Caching already loaded data in-memory to subsequently avoid outgoing requests.
+var metricsCache = new Map();
 var histogramSumCache = new Map();
 
+function getChannel() {
+  return $("#select_channel").val();
+}
+
+function getVersion() {
+  if ($("#select_version option").length == 0) {
+    return null;
+  }
+  return $("#select_version").val();
+}
+
+async function getMetrics() {
+  let cacheId = `${getChannel()}/${getVersion()}`;
+  if (!metricsCache.get(cacheId)) {
+    let filterOptions = await new Promise(r => {
+      return Telemetry.getFilterOptions(getChannel(), getVersion(), r);
+    });
+    metricsCache.set(cacheId, filterOptions.metric);
+  }
+
+  return metricsCache.get(cacheId).filter(m => m.startsWith("USE_COUNTER2_"));
+}
+
 async function getHistogramSum(metric) {
-  if (histogramSumCache.has(metric)) {
-    return histogramSumCache.get(metric);
+  let cacheId = `${getChannel()}/${getVersion()}/${metric}`;
+
+  if (histogramSumCache.has(cacheId)) {
+    return histogramSumCache.get(cacheId);
   }
 
   let filters = {};
-  let evo = await new Promise(r => Telemetry.getEvolution(channel, version, metric, filters, false, r));
+  let evo = await new Promise(r => Telemetry.getEvolution(getChannel(), getVersion(), metric, filters, false, r));
   let sum = 0;
   if ("" in evo) {
     sum = evo[""].histogram().sum;
   }
 
-  histogramSumCache.set(metric, sum);
+  histogramSumCache.set(cacheId, sum);
   return sum;
 }
 
@@ -205,17 +264,17 @@ async function addTable(metrics) {
   $('.data').append(table);
 }
 
-function makeHash(kind, group) {
-  window.location.hash = `#kind=${encodeURIComponent(kind)}&group=${encodeURIComponent(group)}`;
+function makeHash() {
+  window.location.hash = `#kind=${encodeURIComponent($('.kind').val())}` +
+                         `&group=${encodeURIComponent($('.groups').val())}` +
+                         `&channel=${getChannel()}` +
+                         `&version=${getVersion()}`;
 }
 
-async function update() {
+async function updateMetrics() {
   $('.data').empty();
-
   let kind = $('.kind').val();
   let group = $('.groups').val();
-  console.log("group:", group);
-  makeHash(kind, group);
 
   let metrics = (await getMetrics())
                   .filter(m => m.endsWith("_" + kind.toUpperCase()))
@@ -232,23 +291,44 @@ function parseQueryString() {
     params.set(key, decodeURIComponent(value));
   }
 
-  if (params.has('kind')) {
-    $('.kind').val(params.get('kind'));
-  }
-
-  if (params.has('group')) {
-    $('.groups').val(params.get('group'));
-  }
+  return params;
 }
 
-async function initUI() {
-  $('#version').text(version);
-  $('#channel').text(channel);
+async function updateUI(params = null) {
+  var last = array => array[array.length - 1];
+
+  if (params && params.has('channel')) {
+    let channel = params.get('channel');
+    if (gValidChannels.includes(channel)) {
+      $('#select_channel').val(channel);
+    }
+  }
+
+  // Show only versions available for this channel.
+  const validVersions = gAvailableVersions.get(getChannel());
+  console.log("validVersions", validVersions);
+  $("#select_version > option").each(function() {
+    $(this).toggle(validVersions.includes(parseInt(this.value)));
+  });
+
+  // Use the closest valid version if an unavailable one was selected.
+  let version = (getVersion() != null) ? parseInt(getVersion()) : validVersions[0];
+  if (params && params.has('version')) {
+    version = parseInt(params.get('version'));
+  }
+  if (!validVersions.includes(version)) {
+    version = Math.max(last(validVersions), Math.min(validVersions[0], version));
+  }
+
+  $("#select_version").val(version);
+
+  // Update top level metrics.
   let topLevelCount = await getHistogramSum("TOP_LEVEL_CONTENT_DOCUMENTS_DESTROYED");
   let docCount = await getHistogramSum("CONTENT_DOCUMENTS_DESTROYED");
   $('#page_count').text(topLevelCount.toLocaleString());
   $('#document_count').text(docCount.toLocaleString());
 
+  // Add individual metrics.
   let metrics = await getMetrics();
   let groups = [...new Set(metrics.map(m => m.split('_')[2]))];
   groups = groups.sort((a, b) => a.localeCompare(b));
@@ -260,16 +340,72 @@ async function initUI() {
     }));
   }
 
-  parseQueryString();
+  if (params && params.has('kind')) {
+    $('.kind').val(params.get('kind'));
+  }
 
-  $('.groups').change(update);
-  $('.kind').change(update);
+  if (params && params.has('group')) {
+    $('.groups').val(params.get('group'));
+  }
+}
+
+async function update(params = null) {
+  document.getElementById("loading-overlay").classList.remove("hidden");
+
+  await updateUI(params);
+  makeHash();
+  await updateMetrics();
+
+  document.getElementById("loading-overlay").classList.add("hidden");
+}
+
+function initUI() {
+  // Build map of sorted valid versions per channel.
+  let versions = Telemetry.getVersions()
+                          .map(v => v.split("/"))
+                          .filter(v => gValidChannels.includes(v[0]));
+  gAvailableVersions = new Map();
+  for (let channel of gValidChannels) {
+    let vs = versions.filter(v => v[0] == channel)
+                     .map(v => parseInt(v[1]))
+                     .sort()
+                     .reverse();
+    gAvailableVersions.set(channel, vs);
+  }
+
+  // Sanitize beta version range.
+  if (gAvailableVersions.get("beta")[0] == gAvailableVersions.get("nightly")[0]) {
+    gAvailableVersions.get("beta").shift();
+  }
+
+  // Fill version selector.
+  let select = $("#select_version");
+  let allVersions = [... (new Set(versions.map(v => parseInt(v[1])))).values()]
+                      .sort()
+                      .reverse();
+  for (var version of allVersions) {
+    select.append("<option value=\""+version+"\" >"+version+"</option>");
+  }
+
+  // Set up event handlers.
+  let handler = () => update();
+  let selectors = [
+    "#select_version",
+    "#select_channel",
+    ".groups",
+    ".kind",
+  ];
+
+  for (let selector of selectors) {
+    $(selector).change(handler);
+    $(selector).keyup(handler);
+  }
 }
 
 async function start() {
   await new Promise(r => Telemetry.init(r));
-  await initUI();
-  await update();
+  initUI();
+  await update(parseQueryString())
 }
 
 start();
