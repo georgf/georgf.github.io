@@ -71,6 +71,32 @@ td {
     display: none;
 }
 
+.infolink
+{
+    display: inline-block;
+    font-family: sans-serif;
+    font-weight: bold;
+    text-align: center;
+    width: 1.5ex;
+    height: 1.5ex;
+    font-size: 1.0ex;
+    border-radius: 1.4ex;
+    margin-right: 0px;
+    padding: 2px;
+    color: black;
+    background: white;
+    border: 1px solid black;
+    text-decoration: none;
+}
+
+.infolink:hover
+{
+    color: white;
+    background: black;
+    border-color: white;
+    text-decoration: none;
+}
+
 </style>
 
 </head>
@@ -174,6 +200,24 @@ function strippedUseCounterName(uc) {
            .replace(regexSuffix, '');
 }
 
+function linkForProbeDetails(id) {
+  const base = `https://georgf.github.io/fx-data-explorer/`;
+  const params = {
+    searchtype: "in_any",
+    optout: "false",
+    constraint: "is_in",
+    version: "any",
+    detailView: `histogram/${id}`,
+    channel: getChannel(),
+    search: id,
+  };
+
+  return "https://georgf.github.io/fx-data-explorer/?" +
+         Object.entries(params)
+               .map(p => p[0] + "=" + encodeURIComponent(p[1]))
+               .join("&");
+}
+
 function createTable(data) {
   let table = document.createElement('table');
 
@@ -182,7 +226,14 @@ function createTable(data) {
 
     // Add name.
     let td = document.createElement('td');
-    td.appendChild(document.createTextNode(d.shortName));
+    td.appendChild(document.createTextNode(d.shortName + " "));
+    let link = $('<a>', {
+      text: "?",
+      title: "More about this probe",
+      href: linkForProbeDetails(d.metric),
+      "class": "infolink",
+    });
+    link.appendTo(td);
     td.setAttribute('title', d.metric);
     tr.appendChild(td);
 
