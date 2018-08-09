@@ -10,8 +10,22 @@ body {
   margin: 5px;
 }
 
+#menu a {
+  color: grey;
+  text-decoration: none;
+}
+
 #menu a:visited {
-  color: white;
+  color: grey;
+  text-decoration: none;
+}
+
+.button {
+  margin: 0px;
+  margin-right: 5px;
+  padding: 5px;
+  background-color: white;
+  color: grey;
 }
 
 #content {
